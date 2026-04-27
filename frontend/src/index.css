@@ -2,7 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 body {
-  background: url(../public/bg.avif);
+  /* background: url(../public/bg.avif); */
+ background: radial-gradient(circle at top left, #89f7fe, transparent 40%),
+            radial-gradient(circle at bottom right, #66a6ff, transparent 40%),
+            #0f172a;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
