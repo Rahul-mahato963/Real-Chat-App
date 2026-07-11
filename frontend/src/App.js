@@ -3,7 +3,7 @@ import './App.css';
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import HomePage from './components/HomePage';
 import Login from './components/Login';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import {useSelector,useDispatch} from "react-redux";
 import io from "socket.io-client";
 import { setSocket } from './redux/socketSlice';
@@ -43,19 +43,23 @@ function App() {
       socketio?.on('getOnlineUsers', (onlineUsers)=>{
         dispatch(setOnlineUsers(onlineUsers))
       });
-      return () => socketio.close();
-    }else{
-      if(socket){
-        socket.close();
+      return () => {
+        socketio.close();
         dispatch(setSocket(null));
-      }
+      };
     }
+  },[authUser, dispatch]);
 
-  },[authUser]);
+  useEffect(()=>{
+    if(!authUser && socket){
+      socket.close();
+      dispatch(setSocket(null));
+    }
+  },[authUser, socket, dispatch]);
 
   return (
-    <div className="p-4 h-screen flex items-center justify-center">
-      <RouterProvider router={router}/>
+    <div className="flex min-h-screen w-full items-center justify-center overflow-x-hidden p-3 text-slate-950 sm:p-6">
+      <RouterProvider router={router} future={{ v7_startTransition: true }}/>
     </div>
 
   );

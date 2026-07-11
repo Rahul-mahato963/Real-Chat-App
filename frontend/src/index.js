@@ -10,7 +10,10 @@ import { persistStore } from 'redux-persist';
 
 let persistor = persistStore(store);
 
-export const BASE_URL="https://real-chat-app-backend-gqko.onrender.com"
+const LOCAL_API_URL = "http://localhost:8080";
+const DEPLOYED_API_URL = "https://real-chat-app-backend-gqko.onrender.com";
+
+export const BASE_URL = process.env.REACT_APP_API_URL || (process.env.NODE_ENV === "development" ? LOCAL_API_URL : DEPLOYED_API_URL);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

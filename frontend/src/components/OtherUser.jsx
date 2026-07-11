@@ -1,6 +1,7 @@
 import React from 'react'
 import { useDispatch,useSelector } from "react-redux";
 import { setSelectedUser } from '../redux/userSlice';
+import ProfileAvatar from './ProfileAvatar';
 
 const OtherUser = ({ user }) => {
     const dispatch = useDispatch();
@@ -10,21 +11,23 @@ const OtherUser = ({ user }) => {
         dispatch(setSelectedUser(user));
     }
     return (
-        <>
-            <div onClick={() => selectedUserHandler(user)} className={` ${selectedUser?._id === user?._id ? 'bg-zinc-200 text-black' : 'text-white'} flex gap-2 hover:text-black items-center hover:bg-zinc-200 rounded p-2 cursor-pointer`}>
-                <div className={`avatar ${isOnline ? 'online' : '' }`}>
-                    <div className='w-12 rounded-full'>
-                        <img src={user?.profilePhoto} alt="user-profile" />
-                    </div>
+        <button
+            type='button'
+            onClick={() => selectedUserHandler(user)}
+            className={`${selectedUser?._id === user?._id ? 'border-emerald-400/50 bg-emerald-400/15 text-white shadow-sm' : 'border-transparent bg-transparent text-slate-300'} flex w-full items-center gap-3 rounded-lg border p-2 text-left transition hover:border-white/10 hover:bg-white/10 hover:text-white`}
+        >
+                <div className='relative shrink-0'>
+                    <ProfileAvatar src={user?.profilePhoto} name={user?.fullName} sizeClass='w-11 h-11' />
+                    {
+                        isOnline && (
+                            <span className='absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white bg-emerald-500'></span>
+                        )
+                    }
                 </div>
-                <div className='flex flex-col flex-1'>
-                    <div className='flex justify-between gap-2 '>
-                        <p>{user?.fullName}</p>
-                    </div>
+                <div className='flex min-w-0 flex-1 flex-col'>
+                    <p className='truncate text-sm font-semibold'>{user?.fullName}</p>
                 </div>
-            </div>
-            <div className='divider my-0 py-0 h-1'></div>
-        </>
+        </button>
     )
 }
 

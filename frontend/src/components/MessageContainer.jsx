@@ -1,12 +1,12 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import SendInput from './SendInput'
 import Messages from './Messages';
-import { useSelector,useDispatch } from "react-redux";
-import { setSelectedUser } from '../redux/userSlice';
+import { useSelector } from "react-redux";
+import { FiMessageSquare, FiUsers } from "react-icons/fi";
+import ProfileAvatar from './ProfileAvatar';
 
 const MessageContainer = () => {
     const { selectedUser, authUser, onlineUsers } = useSelector(store => store.user);
-    const dispatch = useDispatch();
 
     const isOnline = onlineUsers?.includes(selectedUser?._id);
    
@@ -14,27 +14,28 @@ const MessageContainer = () => {
         <>
             {
                 selectedUser !== null ? (
-                    <div className='md:min-w-[550px] flex flex-col'>
-                        <div className='flex gap-2 items-center bg-zinc-800 text-white px-4 py-2 mb-2'>
-                            <div className={`avatar ${isOnline ? 'online' : ''}`}>
-                                <div className='w-12 rounded-full'>
-                                    <img src={selectedUser?.profilePhoto} alt="user-profile" />
-                                </div>
-                            </div>
-                            <div className='flex flex-col flex-1'>
-                                <div className='flex justify-between gap-2'>
-                                    <p>{selectedUser?.fullName}</p>
-                                </div>
+                    <div className='chat-panel-bg flex min-h-0 flex-1 flex-col'>
+                        <div className='flex items-center gap-3 border-b border-emerald-100/80 bg-white/85 px-4 py-3 backdrop-blur'>
+                            <ProfileAvatar src={selectedUser?.profilePhoto} name={selectedUser?.fullName} online={isOnline} sizeClass='w-11 h-11' />
+                            <div className='min-w-0 flex-1'>
+                                <p className='truncate text-sm font-bold text-slate-950'>{selectedUser?.fullName}</p>
+                                <p className={`${isOnline ? 'text-emerald-600' : 'text-slate-400'} text-xs`}>{isOnline ? 'Active now' : 'Away'}</p>
                             </div>
                         </div>
                         <Messages />
                         <SendInput />
                     </div>
                 ) : (
-                    <div className='md:min-w-[550px] flex flex-col justify-center items-center'>
-                        <h1 className='text-4xl text-white font-bold'>Hi,{authUser?.fullName} </h1>
-                        <h1 className='text-2xl text-white'>Let's start conversation</h1>
-
+                    <div className='chat-panel-bg flex min-h-[22rem] flex-1 flex-col items-center justify-center px-6 py-10 text-center'>
+                        <div className='mb-5 flex h-16 w-16 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 shadow-sm'>
+                            <FiMessageSquare className='h-7 w-7' />
+                        </div>
+                        <h2 className='max-w-md text-2xl font-bold text-slate-950'>Hi, {authUser?.fullName || "there"}</h2>
+                        <p className='mt-2 max-w-sm text-sm leading-6 text-slate-500'>Choose a conversation from the sidebar and your messages will appear here.</p>
+                        <div className='mt-6 flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 shadow-sm'>
+                            <FiUsers className='h-4 w-4 text-emerald-600' />
+                            Ready for real-time chat
+                        </div>
                     </div>
                 )
             }

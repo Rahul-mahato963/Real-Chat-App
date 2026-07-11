@@ -1,15 +1,34 @@
 import { User } from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { createProfilePhoto } from "../utils/avatar.js";
+
+const shouldUseSecureCookies = process.env.NODE_ENV === "production" || process.env.RENDER === "true";
+const authCookieOptions = {
+    httpOnly: true,
+    sameSite: shouldUseSecureCookies ? "none" : "lax",
+    secure: shouldUseSecureCookies,
+};
+
+const getDuplicateField = (error) => {
+    if (error?.code !== 11000) return null;
+    return Object.keys(error.keyPattern || error.keyValue || {})[0] || "field";
+};
+
+const MAX_PROFILE_PHOTO_LENGTH = 1_500_000;
+const profilePhotoPattern = /^data:image\/(png|jpe?g|webp);base64,/i;
 
 export const register = async (req, res) => {
     try {
-        const { fullName, username, password, confirmPassword, gender } = req.body;
+        const { fullName, username, password, confirmPassword, gender, profilePhoto } = req.body;
         if (!fullName || !username || !password || !confirmPassword || !gender) {
             return res.status(400).json({ message: "All fields are required" });
         }
         if (password !== confirmPassword) {
             return res.status(400).json({ message: "Password do not match" });
+        }
+        if (profilePhoto && (!profilePhotoPattern.test(profilePhoto) || profilePhoto.length > MAX_PROFILE_PHOTO_LENGTH)) {
+            return res.status(400).json({ message: "Profile photo must be a PNG, JPG, or WebP image under 1MB" });
         }
 
         const user = await User.findOne({ username });
@@ -18,15 +37,11 @@ export const register = async (req, res) => {
         }
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // profilePhoto
-        const maleProfilePhoto = `https://avatar.iran.liara.run/public/boy?username=${username}`;
-        const femaleProfilePhoto = `https://avatar.iran.liara.run/public/girl?username=${username}`;
-
         await User.create({
             fullName,
             username,
             password: hashedPassword,
-            profilePhoto: gender === "male" ? maleProfilePhoto : femaleProfilePhoto,
+            profilePhoto: profilePhoto || createProfilePhoto({ fullName, username, gender }),
             gender
         });
         return res.status(201).json({
@@ -35,6 +50,11 @@ export const register = async (req, res) => {
         })
     } catch (error) {
         console.log(error);
+        const duplicateField = getDuplicateField(error);
+        if (duplicateField) {
+            return res.status(400).json({ message: `${duplicateField} already exists` });
+        }
+        return res.status(500).json({ message: "Internal server error" });
     }
 };
 export const login = async (req, res) => {
@@ -63,7 +83,7 @@ export const login = async (req, res) => {
 
         const token = await jwt.sign(tokenData, process.env.JWT_SECRET_KEY, { expiresIn: '1d' });
 
-        return res.status(200).cookie("token", token, { maxAge: 1 * 24 * 60 * 60 * 1000, httpOnly: true, sameSite: 'strict' }).json({
+        return res.status(200).cookie("token", token, { ...authCookieOptions, maxAge: 1 * 24 * 60 * 60 * 1000 }).json({
             _id: user._id,
             username: user.username,
             fullName: user.fullName,
@@ -72,15 +92,17 @@ export const login = async (req, res) => {
 
     } catch (error) {
         console.log(error);
+        return res.status(500).json({ message: "Internal server error" });
     }
 }
 export const logout = (req, res) => {
     try {
-        return res.status(200).cookie("token", "", { maxAge: 0 }).json({
-            message: "logged out successfully."
+        return res.status(200).clearCookie("token", authCookieOptions).json({
+            message: "Logged out successfully."
         })
     } catch (error) {
         console.log(error);
+        return res.status(500).json({ message: "Internal server error" });
     }
 }
 export const getOtherUsers = async (req, res) => {
@@ -90,5 +112,6 @@ export const getOtherUsers = async (req, res) => {
         return res.status(200).json(otherUsers);
     } catch (error) {
         console.log(error);
+        return res.status(500).json({ message: "Internal server error" });
     }
 }

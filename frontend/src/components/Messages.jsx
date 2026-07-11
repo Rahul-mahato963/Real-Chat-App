@@ -9,7 +9,7 @@ const Messages = () => {
     useGetRealTimeMessage();
     const { messages } = useSelector(store => store.message);
     return (
-        <div className='px-4 flex-1 overflow-auto'>
+        <div className='flex-1 overflow-auto px-4 py-5'>
             {
                messages && messages?.map((message) => {
                     return (

@@ -1,15 +1,18 @@
 import {Server} from "socket.io";
 import http from "http";
 import express from "express";
+import dotenv from "dotenv";
+import { createCorsOptions } from "../config/corsOptions.js";
+
+dotenv.config({});
 
 const app = express();
 
 const server = http.createServer(app);
+const corsOptions = createCorsOptions();
+
 const io = new Server(server, {
-    cors:{
-        origin:['http://localhost:3000'],
-        methods:['GET', 'POST'],
-    },
+    cors: corsOptions,
 });
 
 export const getReceiverSocketId = (receiverId) => {

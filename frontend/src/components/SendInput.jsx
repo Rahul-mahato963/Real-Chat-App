@@ -27,16 +27,16 @@ const SendInput = () => {
         setMessage("");
     }
     return (
-        <form onSubmit={onSubmitHandler} className='px-4 my-3'>
+        <form onSubmit={onSubmitHandler} className='border-t border-emerald-100/80 bg-white/85 px-4 py-3 backdrop-blur'>
             <div className='w-full relative'>
                 <input
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     type="text"
                     placeholder='Send a message...'
-                    className='border text-sm rounded-lg block w-full p-3 border-zinc-500 bg-gray-600 text-white'
+                    className='block w-full rounded-lg border border-slate-200 bg-white py-3 pl-4 pr-12 text-sm text-slate-900 shadow-sm outline-none placeholder:text-slate-400 focus:border-emerald-400'
                 />
-                <button type="submit" className='absolute flex inset-y-0 end-0 items-center pr-4'>
+                <button type="submit" className='absolute inset-y-1.5 end-1.5 flex w-10 items-center justify-center rounded-lg bg-emerald-500 text-white transition hover:bg-emerald-600' aria-label='Send message'>
                     <IoSend />
                 </button>
             </div>
