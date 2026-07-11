@@ -55,7 +55,7 @@ const Sidebar = () => {
         }
     }
     return (
-        <aside className='flex h-72 shrink-0 flex-col border-b border-slate-800/80 bg-slate-950 p-4 text-white md:h-full md:w-80 md:border-b-0 md:border-r'>
+        <aside className='flex h-full min-h-0 w-full shrink-0 flex-col border-b border-slate-800/80 bg-slate-950 p-4 text-white md:w-80 md:border-b-0 md:border-r'>
             <div className='mb-4 flex items-center justify-between gap-3'>
                 <div>
                     <h2 className='text-base font-bold text-white'>Chats</h2>
@@ -88,7 +88,7 @@ const Sidebar = () => {
             </form>
             <div className="my-4 h-px bg-white/10"></div> 
             <OtherUsers/> 
-            <div className='mt-4 border-t border-white/10 pt-4'>
+            <div className='mt-auto shrink-0 border-t border-white/10 pt-4'>
                 <button
                     type='button'
                     onClick={logoutHandler}

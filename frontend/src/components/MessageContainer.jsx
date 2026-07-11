@@ -1,12 +1,14 @@
 import React from 'react'
 import SendInput from './SendInput'
 import Messages from './Messages';
-import { useSelector } from "react-redux";
-import { FiMessageSquare, FiUsers } from "react-icons/fi";
+import { useDispatch, useSelector } from "react-redux";
+import { FiArrowLeft, FiMessageSquare, FiUsers } from "react-icons/fi";
 import ProfileAvatar from './ProfileAvatar';
+import { setSelectedUser } from '../redux/userSlice';
 
 const MessageContainer = () => {
     const { selectedUser, authUser, onlineUsers } = useSelector(store => store.user);
+    const dispatch = useDispatch();
 
     const isOnline = onlineUsers?.includes(selectedUser?._id);
    
@@ -16,6 +18,15 @@ const MessageContainer = () => {
                 selectedUser !== null ? (
                     <div className='chat-panel-bg flex min-h-0 flex-1 flex-col'>
                         <div className='flex items-center gap-3 border-b border-emerald-100/80 bg-white/85 px-4 py-3 backdrop-blur'>
+                            <button
+                                type='button'
+                                onClick={() => dispatch(setSelectedUser(null))}
+                                className='btn btn-ghost btn-sm h-9 w-9 shrink-0 rounded-lg p-0 text-slate-600 hover:bg-slate-100 md:hidden'
+                                aria-label='Back to chats'
+                                title='Back to chats'
+                            >
+                                <FiArrowLeft className='h-5 w-5' />
+                            </button>
                             <ProfileAvatar src={selectedUser?.profilePhoto} name={selectedUser?.fullName} online={isOnline} sizeClass='w-11 h-11' />
                             <div className='min-w-0 flex-1'>
                                 <p className='truncate text-sm font-bold text-slate-950'>{selectedUser?.fullName}</p>

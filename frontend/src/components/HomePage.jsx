@@ -7,7 +7,7 @@ import { FiMessageCircle } from "react-icons/fi";
 import ProfileAvatar from './ProfileAvatar'
 
 const HomePage = () => {
-  const { authUser, onlineUsers } = useSelector(store => store.user);
+  const { authUser, onlineUsers, selectedUser } = useSelector(store => store.user);
   const navigate = useNavigate();
   useEffect(() => {
     if (!authUser) {
@@ -38,8 +38,12 @@ const HomePage = () => {
       </header>
 
       <main className='flex min-h-0 flex-1 flex-col md:flex-row'>
-        <Sidebar />
-        <MessageContainer />
+        <div className={`${selectedUser ? 'hidden md:flex' : 'flex'} min-h-0 flex-1 md:flex-none`}>
+          <Sidebar />
+        </div>
+        <div className={`${selectedUser ? 'flex' : 'hidden md:flex'} min-h-0 flex-1`}>
+          <MessageContainer />
+        </div>
       </main>
     </div>
   )

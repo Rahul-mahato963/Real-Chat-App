@@ -13,14 +13,17 @@ const SendInput = () => {
 
     const onSubmitHandler = async (e) => {
         e.preventDefault();
+        const trimmedMessage = message.trim();
+        if (!trimmedMessage || !selectedUser?._id) return;
+
         try {
-            const res = await axios.post(`${BASE_URL}/api/v1/message/send/${selectedUser?._id}`, {message}, {
+            const res = await axios.post(`${BASE_URL}/api/v1/message/send/${selectedUser?._id}`, {message: trimmedMessage}, {
                 headers:{
                     'Content-Type':'application/json'
                 },
                 withCredentials:true
             });
-            dispatch(setMessages([...messages, res?.data?.newMessage]))
+            dispatch(setMessages([...(messages || []), res?.data?.newMessage]))
         } catch (error) {
             console.log(error);
         } 
