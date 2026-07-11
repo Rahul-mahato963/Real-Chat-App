@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: real-chat-app-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET_KEY
+        sync: false
+      - key: FRONTEND_URL
+        value: https://real-chat-app-ke0t.onrender.com
+      - key: NODE_ENV
+        value: production
+
+  - type: web
+    name: real-chat-app
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: build
+    envVars:
+      - key: REACT_APP_API_URL
+        value: https://real-chat-app-backend-gqko.onrender.com
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
