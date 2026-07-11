@@ -3,11 +3,23 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { createProfilePhoto } from "../utils/avatar.js";
 
-const shouldUseSecureCookies = process.env.NODE_ENV === "production" || process.env.RENDER === "true";
-const authCookieOptions = {
-    httpOnly: true,
-    sameSite: shouldUseSecureCookies ? "none" : "lax",
-    secure: shouldUseSecureCookies,
+const localOriginPattern = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
+
+const getAuthCookieOptions = (req) => {
+    const origin = req.headers.origin || "";
+    const isLocalOrigin = localOriginPattern.test(origin);
+    const shouldUseSecureCookies = !isLocalOrigin && (
+        origin.startsWith("https://") ||
+        process.env.NODE_ENV === "production" ||
+        Boolean(process.env.RENDER) ||
+        Boolean(process.env.RENDER_EXTERNAL_URL)
+    );
+
+    return {
+        httpOnly: true,
+        sameSite: shouldUseSecureCookies ? "none" : "lax",
+        secure: shouldUseSecureCookies,
+    };
 };
 
 const getDuplicateField = (error) => {
@@ -83,7 +95,7 @@ export const login = async (req, res) => {
 
         const token = await jwt.sign(tokenData, process.env.JWT_SECRET_KEY, { expiresIn: '1d' });
 
-        return res.status(200).cookie("token", token, { ...authCookieOptions, maxAge: 1 * 24 * 60 * 60 * 1000 }).json({
+        return res.status(200).cookie("token", token, { ...getAuthCookieOptions(req), maxAge: 1 * 24 * 60 * 60 * 1000 }).json({
             _id: user._id,
             username: user.username,
             fullName: user.fullName,
@@ -97,7 +109,7 @@ export const login = async (req, res) => {
 }
 export const logout = (req, res) => {
     try {
-        return res.status(200).clearCookie("token", authCookieOptions).json({
+        return res.status(200).clearCookie("token", getAuthCookieOptions(req)).json({
             message: "Logged out successfully."
         })
     } catch (error) {
